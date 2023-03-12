@@ -1,0 +1,5 @@
+name = "m3u8proxy"
+main = "src/index.ts"
+compatibility_date = "2023-03-12"
+type = "javascript"
+workers_dev = true
