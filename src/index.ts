@@ -5,8 +5,8 @@ addEventListener("fetch", (event) => {
 async function respondfetch(request) {
   try {
     const url = new URL(request.url);
-    const refererUrl = url.searchParams.get("referer");
-    const targetUrl = url.searchParams.get("url");
+    const refererUrl = decodeURIComponent(url.searchParams.get("referer") || "");
+    const targetUrl = decodeURIComponent(url.searchParams.get("url") || "");
 
     if (!targetUrl) {
       return new Response("Invalid URL", { status: 400 });
@@ -17,33 +17,32 @@ async function respondfetch(request) {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, HEAD, POST, PUT, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type",
-        Referer: refererUrl || request.headers?.get("Referer") || "",
+        Referer: refererUrl || "",
       },
     });
 
-    /*return new Response(response.body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: {
-        "Access-Control-Allow-Origin": request.headers.get("Referer") || "*",
-        "Content-Type":
-          response.headers?.get("Content-Type") ||  "application/json",
-      },
-    });*/
-
     let modifiedM3u8;
-    if (targetUrl.endsWith(".m3u8")) {
-      const responseText = await response.text();
-      modifiedM3u8 = responseText
+    if (targetUrl.includes(".m3u8")) {
+      modifiedM3u8 = await response.text();
+
+      if (refererUrl) {
+        const regex = /(#EXTINF:.+?,)\n(ep\.\d+?\.\w+.+)/gm;
+        modifiedM3u8 = modifiedM3u8.replace(regex, (match, p1, p2) => {
+          return `${p1}\n${p2}${refererUrl ? `&referer=${encodeURIComponent(refererUrl)}` : ""}`;
+        });
+      }
+      
+
+      modifiedM3u8 = modifiedM3u8
         .replace(
           /(#[^\n]*\n)?((?:#EXTINF:|)([\d\.]+),)([^\n]*)/g,
           (match, p1, p2, p3, p4) => {
-            return `${p1 || ""}${p2}\n?url=${targetUrl
+            return `${p1 || ""}${p2}${p4}\n?url=${encodeURIComponent(targetUrl
               .replace(/([^/]+\.m3u8)$/, "")
-              .trim()}${p4}${refererUrl ? `&referer=${refererUrl}` : ""}`;
+              .trim())}`;
           }
         )
-        .replace(/\n(ep\.\d+\.\d+\.\w+)/g, "$1");
+        .replace(/\n(ep\.\d+\.\d+\.\w+)/g, "$1"); 
     }
 
     return new Response(modifiedM3u8 || response.body, {
@@ -52,7 +51,8 @@ async function respondfetch(request) {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type":
-          response.headers?.get("Content-Type") || "application/json",
+          response.headers?.get("Content-Type") ||
+          "application/vnd.apple.mpegurl",
       },
     });
   } catch (e) {
