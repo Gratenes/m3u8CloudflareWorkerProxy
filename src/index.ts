@@ -37,12 +37,15 @@ async function respondfetch(request) {
         .replace(
           /(#[^\n]*\n)?((?:#EXTINF:|)([\d\.]+),)([^\n]*)/g,
           (match, p1, p2, p3, p4) => {
-            return `${p1 || ""}${p2}${p4}\n?url=${encodeURIComponent(targetUrl
-              .replace(/([^/]+\.m3u8)$/, "")
-              .trim())}`;
+            return `${p1 || ""}${p2}${p4}\n?url=${encodeURIComponent(
+              targetUrl.replace(/([^/]+\.m3u8)$/, "").trim()
+            )}`;
           }
         )
-        .replace(/\n(ep\.\d+\.\d+\.\w+)/g, "$1"); 
+        .replace(
+          /\n(.+\..+\.(tff|srt|woff|html|js|svg|ico|jpg|css|vtt))/g,
+          (match, g1, g2) => g1
+        ); 
     }
 
     return new Response(modifiedM3u8 || response.body, {
