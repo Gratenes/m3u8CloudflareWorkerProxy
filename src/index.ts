@@ -25,27 +25,16 @@ async function respondfetch(request) {
     if (targetUrl.includes(".m3u8")) {
       modifiedM3u8 = await response.text();
 
-      if (refererUrl) {
-        const regex = /(#EXTINF:.+?,)\n(ep\.\d+?\.\w+.+)/gm;
-        modifiedM3u8 = modifiedM3u8.replace(regex, (match, p1, p2) => {
-          return `${p1}\n${p2}${refererUrl ? `&referer=${encodeURIComponent(refererUrl)}` : ""}`;
-        });
-      }
-      
-
-      modifiedM3u8 = modifiedM3u8
-        .replace(
-          /(#[^\n]*\n)?((?:#EXTINF:|)([\d\.]+),)([^\n]*)/g,
-          (match, p1, p2, p3, p4) => {
-            return `${p1 || ""}${p2}${p4}\n?url=${encodeURIComponent(
-              targetUrl.replace(/([^/]+\.m3u8)$/, "").trim()
-            )}`;
-          }
-        )
-        .replace(
-          /\n(.+\..+\.(tff|srt|woff|html|js|svg|ico|jpg|css|vtt))/g,
-          (match, g1, g2) => g1
-        ); 
+      modifiedM3u8 = modifiedM3u8.split("\n").map((line) => {
+        if (line.startsWith("#")) {
+          return line;
+        }
+        return `?url=${encodeURIComponent(
+          targetUrl.replace(/([^/]+\.m3u8)$/, "").trim()
+        )}${line}${
+          refererUrl ? `&referer=${encodeURIComponent(refererUrl)}` : ""
+        }`;
+      }).join("\n");
     }
 
     return new Response(modifiedM3u8 || response.body, {
