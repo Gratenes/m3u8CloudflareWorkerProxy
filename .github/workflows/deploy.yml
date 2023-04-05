@@ -2,18 +2,18 @@ name: Deploy
 
 on:
   push:
-    branches:
-      - main
-
+  pull_request:
+  repository_dispatch:
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    name: Deploy
+    timeout-minutes: 60
+    needs: test
     steps:
       - uses: actions/checkout@v2
       - name: Publish
-        uses: cloudflare/wrangler-action@2.0.0
+        uses: cloudflare/wrangler-action@1.3.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
-          postCommands: |
-            wrangler publish
+          command: publish
