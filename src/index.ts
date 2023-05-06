@@ -29,6 +29,9 @@ async function respondfetch(request) {
         if (line.startsWith("#")) {
           return line;
         }
+        else if(line.trim() == ''){
+          return line;
+        }
         return `?url=${encodeURIComponent(
           targetUrl.replace(/([^/]+\.m3u8)$/, "").trim()
         )}${line}${
