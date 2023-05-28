@@ -24,19 +24,16 @@ async function respondfetch(request) {
     let modifiedM3u8;
     if (targetUrl.includes(".m3u8")) {
       modifiedM3u8 = await response.text();
-
+      const targetUrlTrimmed = `${encodeURIComponent(
+        targetUrl.replace(/([^/]+\.m3u8)$/, "").trim()
+      )}`;
+      const encodedUrl = encodeURIComponent(refererUrl);
       modifiedM3u8 = modifiedM3u8.split("\n").map((line) => {
-        if (line.startsWith("#")) {
+        if (line.startsWith("#") || line.trim() == '') {
           return line;
         }
-        else if(line.trim() == ''){
-          return line;
-        }
-        return `?url=${encodeURIComponent(
-          targetUrl.replace(/([^/]+\.m3u8)$/, "").trim()
-        )}${line}${
-          refererUrl ? `&referer=${encodeURIComponent(refererUrl)}` : ""
-        }`;
+        return `?url=${targetUrlTrimmed}${line}${refererUrl ? `&referer=${encodedUrl}` : ""
+          }`;
       }).join("\n");
     }
 
