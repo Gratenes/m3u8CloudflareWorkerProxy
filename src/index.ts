@@ -7,6 +7,7 @@ async function respondfetch(request) {
     const url = new URL(request.url);
     const refererUrl = decodeURIComponent(url.searchParams.get("referer") || "");
     const targetUrl = decodeURIComponent(url.searchParams.get("url") || "");
+    const originUrl = decodeURIComponent(url.searchParams.get("origin") || "");
 
     if (!targetUrl) {
       return new Response("Invalid URL", { status: 400 });
@@ -18,6 +19,7 @@ async function respondfetch(request) {
         "Access-Control-Allow-Methods": "GET, HEAD, POST, PUT, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type",
         Referer: refererUrl || "",
+        Origin: originUrl || "",
       },
     });
 
