@@ -17,7 +17,7 @@ async function respondfetch(request) {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, HEAD, POST, PUT, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type",
-        Referer: refererUrl || "",
+        "Origin": refererUrl || ""
       },
     });
 
