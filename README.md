@@ -14,10 +14,14 @@ npx wrangler publish
 
 ### Example:
 ```js
-const url = 'example.url.example/?url=Link.m3u8&referer=url.example'
+const url = 'https://example.url.example/?url=Link.m3u8&origin=url.example'
 
 // If either your url or link has parameter's, encode via encodeURIComponent(link)
-const encodedUrl = `example.url.example/?url=${encodeURIComponent(Link.m3u8)}&referer=${encodeURIComponent(url.example)}`
+const encodedUrl = `https://m3u8.proxy.example/
+?url=${encodeURIComponent("https://thisdomain.works/file.m3u8")}
+&referer=${encodeURIComponent("https://thisdomain.works")}
+&origin=${encodeURIComponent("https://thisdomain.works")}
+`
 ```
 
 > #### Cloudflare Workers Docs: https://developers.cloudflare.com/workers/get-started/guide/
