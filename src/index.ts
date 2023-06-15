@@ -30,11 +30,13 @@ async function respondfetch(request) {
         targetUrl.replace(/([^/]+\.m3u8)$/, "").trim()
       )}`;
       const encodedUrl = encodeURIComponent(refererUrl);
+      const encodedOrigin = encodeURIComponent(originUrl);
       modifiedM3u8 = modifiedM3u8.split("\n").map((line) => {
         if (line.startsWith("#") || line.trim() == '') {
           return line;
         }
-        return `?url=${targetUrlTrimmed}${line}${refererUrl ? `&referer=${encodedUrl}` : ""
+        return `?url=${targetUrlTrimmed}${line}${originUrl ? `&origin=${encodedOrigin}` : ""
+      }${refererUrl ? `&referer=${encodedUrl}` : ""
           }`;
       }).join("\n");
     }
