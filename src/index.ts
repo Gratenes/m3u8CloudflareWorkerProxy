@@ -8,7 +8,8 @@ async function respondfetch(request) {
     const refererUrl = decodeURIComponent(url.searchParams.get("referer") || "");
     const targetUrl = decodeURIComponent(url.searchParams.get("url") || "");
     const originUrl = decodeURIComponent(url.searchParams.get("origin") || "");
-
+    const proxyAll = decodeURIComponent(url.searchParams.get("all") || "");
+    
     if (!targetUrl) {
       return new Response("Invalid URL", { status: 400 });
     }
@@ -34,6 +35,9 @@ async function respondfetch(request) {
       modifiedM3u8 = modifiedM3u8.split("\n").map((line) => {
         if (line.startsWith("#") || line.trim() == '') {
           return line;
+        }
+        else if(proxyAll == 'yes' && line.startsWith('http')){ //https://yourproxy.com/?url=https://somevideo.m3u8&all=yes
+          return `${url.origin}?url=${line}`;
         }
         return `?url=${targetUrlTrimmed}${line}${originUrl ? `&origin=${encodedOrigin}` : ""
       }${refererUrl ? `&referer=${encodedUrl}` : ""
