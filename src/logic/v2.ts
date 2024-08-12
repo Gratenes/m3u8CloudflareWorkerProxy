@@ -59,7 +59,7 @@ export const M3u8ProxyV2 = async (request: Request<unknown>): Promise<Response> 
         continue;
       }
 
-      const url = getUrl(line, scrapeUrl.protocol + "//" + scrapeUrl.hostname)
+      const url = getUrl(line, scrapeUrl)
       const searchParams = new URLSearchParams()
 
       searchParams.set('url', url.toString())
