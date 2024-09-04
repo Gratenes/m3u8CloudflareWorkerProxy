@@ -1,5 +1,19 @@
 import {getUrl} from "../utils";
 
+const m3u8ContentTypes: string[] = [
+  'application/vnd.',
+  'video/MP2T',
+  'application/x-mpegURL',
+  'application/mpegURL',
+  'application/x-mpegurl',
+  'application/vnd.apple.mpegurl',
+  'audio/mpegurl',
+  'audio/x-mpegURL',
+  'video/x-mpegurl',
+  'application/vnd.apple.mpegurl.audio',
+  'application/vnd.apple.mpegurl.video'
+];
+
 
 export const M3u8ProxyV2 = async (request: Request<unknown>): Promise<Response> => {
   const url = new URL(request.url)
@@ -48,7 +62,7 @@ export const M3u8ProxyV2 = async (request: Request<unknown>): Promise<Response> 
   const responseContentType = response.headers.get('Content-Type')
   let responseBody: BodyInit | null = response.body
 
-  if (responseContentType && (responseContentType.includes("application/vnd.") || responseContentType.includes("video/MP2T"))) {
+  if (responseContentType && m3u8ContentTypes.some(name => responseContentType.includes(name))) {
     const m3u8File = await response.text()
     const m3u8FileChunks = m3u8File.split("\n")
     const m3u8AdjustedChunks: string[] = []
