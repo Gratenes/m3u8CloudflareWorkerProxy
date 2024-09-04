@@ -2,13 +2,13 @@ import {getUrl} from "../utils";
 
 const m3u8ContentTypes: string[] = [
   'application/vnd.',
-  'video/MP2T',
-  'application/x-mpegURL',
-  'application/mpegURL',
+  'video/mp2t',
+  'application/x-mpegurl',
+  'application/mpegurl',
   'application/x-mpegurl',
   'application/vnd.apple.mpegurl',
   'audio/mpegurl',
-  'audio/x-mpegURL',
+  'audio/x-mpegurl',
   'video/x-mpegurl',
   'application/vnd.apple.mpegurl.audio',
   'application/vnd.apple.mpegurl.video'
@@ -59,7 +59,7 @@ export const M3u8ProxyV2 = async (request: Request<unknown>): Promise<Response> 
 
 
   // get the content type of the response
-  const responseContentType = response.headers.get('Content-Type')
+  const responseContentType = response.headers.get('Content-Type')?.toLowerCase()
   let responseBody: BodyInit | null = response.body
 
   if (responseContentType && m3u8ContentTypes.some(name => responseContentType.includes(name))) {
