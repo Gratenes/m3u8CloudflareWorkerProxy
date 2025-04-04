@@ -11,13 +11,13 @@ async function respondfetch(request: Request) {
 
   if (pathname === "/") return M3u8ProxyV1(request)
   if (pathname === "/v2") {
-    if (request.method == "OPTIONS") return new Response(null, {
+    /* if (request.method == "OPTIONS") return new Response(null, {
       status: 204, // No Content
       headers: {
         'Access-Control-Allow-Methods': 'GET',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       }
-    });
+    }); */
 
     return M3u8ProxyV2(request)
   }

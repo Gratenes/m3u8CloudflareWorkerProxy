@@ -3,13 +3,19 @@ export function getUrl(input: string, fallbackUrl: URL): URL {
   try {
     return new URL(input)
   } catch (e) {
+    if (input.startsWith("//")) {
+      return new URL(input.replace("//", "https://"))
+    }
+
     const pathname = input.startsWith("/")
       ? input.substring(1)
       : input;
     const pathnames = fallbackUrl.pathname.split("/")
-    pathnames[pathnames.length - 1] = pathname;
+    pathnames.pop()
+    pathnames.push(pathname)
 
-    fallbackUrl.pathname = pathnames.join("/")
-    return fallbackUrl
+    const fallbackUrlClone = new URL(fallbackUrl)
+    fallbackUrlClone.pathname = pathnames.join("/")
+    return fallbackUrlClone
   }
 }

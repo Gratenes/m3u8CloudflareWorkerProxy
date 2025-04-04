@@ -64,6 +64,7 @@ export const M3u8ProxyV2 = async (
 
   const response = await fetch(scrapeUrlString, {
     headers: headers,
+    method: request.method,
   });
 
   // get the content type of the response
@@ -76,8 +77,6 @@ export const M3u8ProxyV2 = async (
     scrapeUrl.pathname.endsWith(".m3u8") ||
     (responseContentType &&
       m3u8ContentTypes.some((name) => responseContentType.includes(name)));
-
-  console.log(`Is m3u8: ${isM3u8}`);
 
   if (isM3u8) {
     const m3u8File = await response.text();
@@ -100,7 +99,42 @@ export const M3u8ProxyV2 = async (
             `#EXT-X-MAP:URI="/v2?${searchParams.toString()}"`
           );
         } else {
-          m3u8AdjustedChunks.push(line);
+          if (line.toLowerCase().includes('uri') || line.toLowerCase().includes('url')) {
+            const topKey = line.split(":")[0]
+            const values = line.split(":")[1].split(",")
+            const m3u8LineObject: {
+              [key: string]: string;
+            } = {}
+            for (const value of values) {
+              const key = value.split("=")[0].trim()
+              const val = value.split("=")[1].trim().replace(/"/g, "")
+              m3u8LineObject[key] = val
+            }
+
+            if (m3u8LineObject['URI']) {
+              const searchParams = new URLSearchParams();
+              const url = getUrl(m3u8LineObject['URI'], scrapeUrl)
+              searchParams.set("url", url.toString());
+              if (scrapeHeadersString)
+                searchParams.set("headers", scrapeHeadersString);
+              m3u8LineObject['URI'] = `/v2?${searchParams.toString()}`
+            }
+            
+            if (m3u8LineObject['URL']) {
+              const searchParams = new URLSearchParams();
+              const url = getUrl(m3u8LineObject['URL'], scrapeUrl)
+              searchParams.set("url", url.toString());
+              if (scrapeHeadersString)
+                searchParams.set("headers", scrapeHeadersString);
+              m3u8LineObject['URL'] = `/v2?${searchParams.toString()}`
+            }
+
+            const reconstructedLine = `${topKey}:${Object.keys(m3u8LineObject).map((key) => `${key}="${m3u8LineObject[key]}"`).join(",")}`
+
+            m3u8AdjustedChunks.push(reconstructedLine)
+          } else {
+            m3u8AdjustedChunks.push(line);
+          }
         }
         continue;
       }

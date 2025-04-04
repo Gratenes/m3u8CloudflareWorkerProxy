@@ -1,5 +1,19 @@
 name = "m3u8proxy"
 main = "src/index.ts"
 compatibility_date = "2023-03-12"
-type = "javascript"
-workers_dev = true
+compatibility_flags = ["nodejs_compat"]
+
+[build]
+command = "npm run build --if-present"
+
+[build.upload]
+format = "modules"
+dir = "dist"
+
+[env.production]
+name = "m3u8proxy-prod"
+route = "*/*"
+
+[miniflare]
+port = 8787
+watch = true
