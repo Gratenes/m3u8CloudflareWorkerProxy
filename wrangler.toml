@@ -2,7 +2,7 @@ name = "m3u8proxy"
 main = "src/index.ts"
 compatibility_date = "2023-03-12"
 compatibility_flags = ["nodejs_compat"]
-account_id = f3130440b1b0daacd1b0426a3a7f6bb5
+account_id = "f3130440b1b0daacd1b0426a3a7f6bb5"
 
 [build]
 command = "npm run build --if-present"
